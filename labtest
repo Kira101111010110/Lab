@@ -1,0 +1,83 @@
+#include <stdio.h>
+
+int main() {
+    int A[ 6 ] ;
+    int B[ 6 ] ;
+    int result[ 7 ] ;
+
+    printf( "Enter Number A:\n" ) ;
+    int i = 0 ;
+    while ( i < 6 ) {
+        printf( "A[%d]: ", i ) ;
+        scanf( "%d", &A[ i ] ) ;
+        i++ ;
+    } //end while
+
+    i = 0 ;
+    printf( "Enter Number B:\n" ) ;
+    while ( i < 6 ) {
+        printf( "B[%d]: ", i ) ;
+        scanf( "%d", &B[ i ] ) ;
+        i++ ;
+    } //end while
+
+    char op ;
+    printf( "Operator: " ) ;
+    scanf( " %c", &op ) ;
+
+    i = 0 ;
+    while ( i < 7 ) {
+        result[ i ] = 0 ;
+        i++ ;
+    } //end while
+
+    if ( op == '+' ) {
+        i = 0 ;
+        while ( i < 6 ) {
+        int sum = A[ i ] + B[ i ] ;
+        if ( sum > 10 ) {
+            result[ i + 1 ] = sum % 10 ;
+            result[ i ] += sum / 10 ;
+        } else if ( sum == 10 ) {
+            result[ i + 1 ] = 1 ;
+            result[ i ] += 1 ;
+        } else {
+            result[ i + 1 ] = sum ;
+        } //end else
+        i++ ;
+        } //end while
+    } else if ( op == '-' ) {
+        int borrow = 0 ;
+        i = 5 ;
+        while ( i >= 0 ) {
+            int sub = A[ i ] - B[ i ] - borrow ;
+            if ( sub < 0 ) {
+                sub += 10 ;
+                borrow = 1 ;
+            } else {
+                borrow = 0 ;
+            } //end else
+            result[ i + 1 ] = sub ;
+            i-- ;
+        } //end while
+    } //end else if
+
+    printf( "Index   : X  0  1  2  3  4  5 \n" ) ;
+    printf( "===================================\n" ) ;
+    printf( "Number A:   %2d %2d %2d %2d %2d %2d \n", A[0], A[1], A[2], A[3], A[4], A[5] ) ;
+    printf( "Operator:            %2c\n", op ) ;
+    printf( "Number B:   %2d %2d %2d %2d %2d %2d \n", B[0], B[1], B[2], B[3], B[4], B[5] ) ;
+    printf( "===================================\n" ) ;
+    printf( "Answer  :" ) ;
+    
+    i = 0 ;
+    while ( i < 7 ) {
+        printf( "%2d ", result[ i ] ) ;
+        i++ ;
+    } //end while
+    printf( "\n" ) ;
+    printf( "===================================\n" ) ;
+
+    return 0;
+} //end main
+
