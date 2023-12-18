@@ -1,0 +1,17 @@
+#include <stdio.h>
+
+void printHelloWorld( int n ) {
+  for ( int i = 1 ; i <= n ; i++ ) {
+    printf( "[%d] Hello world\n", i ) ;
+  } //end for
+} //end function
+
+int main() {
+  int n ;
+  printf( "Input number: " ) ;
+  scanf( "%d", &n ) ; 
+
+  printHelloWorld( n ) ;
+
+  return 0 ;
+} //end main
