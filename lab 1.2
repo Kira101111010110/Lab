@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <string.h>
+
+void GetSet( int *num , int *data ) {
+    printf( "Enter many elements in the set:" ) ;
+    scanf( "%d", data ) ;
+
+    printf( "Enter Numer in of elements\n" ) ;
+    for ( int i = 0 ;  i < *data ; ++i )
+    {
+        printf( "Elements %d :" , i + 1  ) ;
+        scanf( "%d" , &num[i] ) ;
+    }//end for 
+}//end void
+
+int main() {
+	
+	int num[100] ;
+    int data ;
+	
+    GetSet( num , &data ) ;
+
+    return 0 ;
+}//end function
