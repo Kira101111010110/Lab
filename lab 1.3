@@ -1,0 +1,24 @@
+#include <stdio.h>
+
+int *GetSet( int *num ) {
+    // รับจำนวนสมาชิกของเซต
+    printf( "Enter many elements in the set: " ) ;
+    scanf( "%d", num ) ;
+
+    // จัดสรรหน่วยความจำสำหรับข้อมูลชุด
+    int *data = malloc( *num * sizeof( int ) ) ;
+
+    // รับค่าของแต่ละสมาชิกในเซต
+    for ( int i = 0 ; i < *num ; ++i ) {
+        printf( "Element %d: ", i + 1 ) ;
+        scanf( "%d", &data[ i ] ) ;
+    } //end for
+    // คืนค่าตัวชี้ไปยังข้อมูลชุด
+    return data ;
+} //end function
+int main() {
+    int num ;
+    int *data = GetSet( &num ) ;
+
+    return 0 ;
+}//end main function
