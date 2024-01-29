@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// โครงสร้างของโหนด
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev; // เพิ่มโหนด prev
+};
+
+// เปลี่ยนตำแหน่งของ A และ B
+void swapNodes(struct Node** head_ref, int x, int y) {
+    if (x == y) return;
+
+    struct Node *prevX = NULL, *currX = *head_ref;
+    while (currX && currX->data != x) {
+        prevX = currX;
+        currX = currX->next;
+    }
+
+    struct Node *prevY = NULL, *currY = *head_ref;
+    while (currY && currY->data != y) {
+        prevY = currY;
+        currY = currY->next;
+    }
+
+    // ถ้าหนึ่งในโหนดไม่พบ
+    if (currX == NULL || currY == NULL) return;
+
+    // ถ้า A ไม่ใช่ตัวแรกของ linked list
+    if (prevX != NULL) prevX->next = currY;
+    else *head_ref = currY;
+
+    // ถ้า B ไม่ใช่ตัวแรกของ linked list
+    if (prevY != NULL) prevY->next = currX;
+    else *head_ref = currX;
+
+    // สลับการเชื่อมโยงของโหนด
+    struct Node* temp = currY->next;
+    currY->next = currX->next;
+    currX->next = temp;
+
+    // ปรับปรุงโหนด prev
+    temp = currY->prev;
+    currY->prev = currX->prev;
+    currX->prev = temp;
+
+    // ปรับปรุงโหนดถัดไปของโหนดก่อนหน้า
+    if (currX->prev != NULL) currX->prev->next = currX;
+    if (currY->prev != NULL) currY->prev->next = currY;
+}
+
+// เพิ่มโหนดใน linked list
+void push(struct Node** head_ref, int new_data) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->data = new_data;
+    new_node->next = *head_ref;
+    new_node->prev = NULL; // กำหนดค่าเริ่มต้นให้ prev เป็น NULL
+    if (*head_ref != NULL) (*head_ref)->prev = new_node; // ปรับปรุง prev ของโหนดถัดไป
+    *head_ref = new_node;
+}
+
+// แสดง linked list
+void printList(struct Node* node) {
+    while (node != NULL) {
+        printf("%d ", node->data);
+        node = node->next;
+    }
+    printf("\n");
+}
+
+// ตัวอย่างการใช้งาน
+int main() {
+    struct Node* start = NULL;
+
+    char command[2];
+    int newData;
+    int pos1, pos2;
+
+    do {
+        printf("Enter command (A - Add data, Y - Swap, Q - Quit): ");
+        scanf("%s", command);
+
+        if (strcmp(command, "A") == 0) {
+            printf("Enter new data: ");
+            scanf("%d", &newData);
+            push(&start, newData);
+        } else if (strcmp(command, "Y") == 0) {
+            printf("Enter positions to swap: ");
+            scanf("%d %d", &pos1, &pos2);
+            swapNodes(&start, pos1, pos2);
+        }
+
+        printf("Current List: ");
+        printList(start);
+
+    } while (strcmp(command, "Q") != 0);
+
+    return 0;
+}
