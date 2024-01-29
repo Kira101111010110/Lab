@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// โครงสร้างของโหนด
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// เปลี่ยนตำแหน่งของ A และ B
+void swapNodes(struct Node** head_ref, int x, int y) {
+    if (x == y) return;
+
+    struct Node *prevX = NULL, *currX = *head_ref;
+    while (currX && currX->data != x) {
+        prevX = currX;
+        currX = currX->next;
+    }
+
+    struct Node *prevY = NULL, *currY = *head_ref;
+    while (currY && currY->data != y) {
+        prevY = currY;
+        currY = currY->next;
+    }
+
+    // ถ้าหนึ่งในโหนดไม่พบ
+    if (currX == NULL || currY == NULL) return;
+
+    // ถ้า A ไม่ใช่ตัวแรกของ linked list
+    if (prevX != NULL) prevX->next = currY;
+    else *head_ref = currY;
+
+    // ถ้า B ไม่ใช่ตัวแรกของ linked list
+    if (prevY != NULL) prevY->next = currX;
+    else *head_ref = currX;
+
+    // สลับการเชื่อมโยงของโหนด
+    struct Node* temp = currY->next;
+    currY->next = currX->next;
+    currX->next = temp;
+}
+
+// เพิ่มโหนดใน linked list
+void push(struct Node** head_ref, int new_data) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->data = new_data;
+    new_node->next = *head_ref;
+    *head_ref = new_node;
+}
+
+// แสดง linked list
+void printList(struct Node* node) {
+    while (node != NULL) {
+        printf("%d ", node->data);
+        node = node->next;
+    }
+    printf("\n");
+}
+
+// ตัวอย่างการใช้งาน
+int main() {
+    struct Node* start = NULL;
+
+    // เพิ่มโหนดใน linked list
+    push(&start, 5);
+    push(&start, 4);
+    push(&start, 3);
+    push(&start, 2);
+    push(&start, 1);
+
+    printf("Before Swap: ");
+    printList(start);
+
+    // Swap โหนด One และ Four
+    swapNodes(&start, 1, 4);
+
+    printf("After Swap:  ");
+    printList(start);
+
+    return 0;
+}
