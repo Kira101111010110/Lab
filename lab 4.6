@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// สร้างโครงสร้างข้อมูลของ Node
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// ฟังก์ชันสร้าง Node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// ฟังก์ชันสลับ Node A และ B ใน Linked List
+void swapNodes(struct Node** head, int a, int b) {
+    if (*head == NULL || a == b) {
+        return; // ไม่สามารถ Swap ได้ ถ้าไม่มีข้อมูลใน Linked List หรือ a เท่ากับ b
+    }
+
+    struct Node *prevA = NULL, *currA = *head;
+    while (currA != NULL && currA->data != a) {
+        prevA = currA;
+        currA = currA->next;
+    }
+
+    struct Node *prevB = NULL, *currB = *head;
+    while (currB != NULL && currB->data != b) {
+        prevB = currB;
+        currB = currB->next;
+    }
+
+    if (currA == NULL || currB == NULL) {
+        return; // ไม่สามารถ Swap ได้ ถ้าตำแหน่ง A หรือ B ไม่ถูกต้อง
+    }
+
+    // ถ้า A ไม่ใช่ตำแหน่งแรก
+    if (prevA != NULL) {
+        prevA->next = currB;
+    } else {
+        *head = currB;
+    }
+
+    // ถ้า B ไม่ใช่ตำแหน่งแรก
+    if (prevB != NULL) {
+        prevB->next = currA;
+    } else {
+        *head = currA;
+    }
+
+    // Swap next pointers
+    struct Node* temp = currA->next;
+    currA->next = currB->next;
+    currB->next = temp;
+}
+
+// ฟังก์ชันแสดงข้อมูลใน Linked List
+void printList(struct Node* head) {
+    while (head != NULL) {
+        printf("%d -> ", head->data);
+        head = head->next;
+    }
+    printf("NULL\n");
+}
+
+// ตัวอย่างการใช้งาน
+int main() {
+    struct Node* start = createNode(1);
+    start->next = createNode(2);
+    start->next->next = createNode(3);
+    start->next->next->next = createNode(4);
+    start->next->next->next->next = createNode(5);
+
+    printf("Before Swap: ");
+    printList(start);
+
+    // เรียกใช้ฟังก์ชัน Swap
+    swapNodes(&start, 1, 4);
+
+    printf("After Swap: ");
+    printList(start);
+
+    return 0;
+}
