@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void explode(const char *str1, char splitter, char ***str2, int *count);
+
+int main() {
+    const char *str1 = "I/Love/You";
+    char splitter = '/';
+    char **str2;
+    int count;
+
+    explode(str1, splitter, &str2, &count);
+
+    printf("Result:\n");
+    for (int i = 0; i < count; ++i) {
+        printf("str2[%d] = \"%s\"\n", i, str2[i]);
+    }
+
+    // Free allocated memory
+    for (int i = 0; i < count; ++i) {
+        free(str2[i]);
+    }
+    free(str2);
+
+    return 0;
+}
+
+void explode(const char *str1, char splitter, char ***str2, int *count) {
+    // Create a copy of the input string
+    char *strCopy = strdup(str1);
+    if (strCopy == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+
+    *count = 1;
+
+    // Count the number of occurrences of the splitter in str1
+    for (int i = 0; strCopy[i] != '\0'; ++i) {
+        if (strCopy[i] == splitter) {
+            (*count)++;
+        }
+    }
+
+    // Allocate memory for an array of strings
+    *str2 = (char **)malloc(*count * sizeof(char *));
+    if (*str2 == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Initialize each string in the array
+    for (int i = 0; i < *count; ++i) {
+        (*str2)[i] = NULL;
+    }
+
+    // Extract substrings using strtok
+    char *token = strtok(strCopy, &splitter);
+    int index = 0;
+
+    while (token != NULL) {
+        // Allocate memory for each substring
+        (*str2)[index] = (char *)malloc((strlen(token) + 1) * sizeof(char));
+        if ((*str2)[index] == NULL) {
+            fprintf(stderr, "Memory allocation error\n");
+            exit(EXIT_FAILURE);
+        }
+
+        // Copy the substring into the array
+        strcpy((*str2)[index], token);
+
+        // Move to the next substring
+        token = strtok(NULL, &splitter);
+        index++;
+    }
+
+    // Free the temporary copy of the string
+    free(strCopy);
+}
