@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct student {
+    char name[ 50 ] ;
+    int age ;
+};
+
+struct student ( *GetStudent( int *room ))[ 10 ] ;
+
+int main() {
+    struct student ( *children )[ 10 ] ;
+    char roomgroup ;
+
+    children = GetStudent( &roomgroup ) ;
+
+    for ( int i = 0; i < roomgroup; i++ ) {
+        for ( int j = 0 ; j < 10 ; j++ ) {
+            printf( "Enter name and age for student %d in room %d: " , j + 1, i + 1 ) ;
+            scanf( "%49s %d" , children[i][j].name , &children[i][j].age ) ;
+        }
+    }
+    free(children);
+
+    return 0;
+}
+struct student ( *GetStudent( int *room ))[ 10 ] {
+    printf( "Enter the number of rooms: " ) ;
+    scanf( "%d" , room ) ;
+
+    struct student ( *children)[10] = (struct student( * )[ 10 ] )malloc(( *room ) * 10 * sizeof( struct student ) ) ;
+
+    if ( children == NULL ) {
+        fprintf( stderr , "Memory allocation error\n" ) ;
+        exit( EXIT_FAILURE ) ;
+    }
+
+    return children ;
+}
