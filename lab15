@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <math.h>
+
+double f(double x);
+double RootOfFunction(double xl, double xr, double epsilon);
+
+int main() {
+double root;
+root = RootOfFunction(-1, 10, 0.1);
+printf("Root = %.1f\n", root);
+return 0;
+}
+
+double f(double x) {
+return 2 * x - 5;
+}
+
+double RootOfFunction(double xl, double xr, double epsilon) {
+double xm;
+while (fabs(xr - xl) > epsilon) {
+xm = (xl + xr) / 2;
+printf("%.1f %.1f %.1f\n", xl, xm, xr); // Print intermediate values
+if (f(xm) * f(xl) < 0)
+xr = xm;
+else
+xl = xm;
+}
+printf("%.1f %.1f %.1f\n", xl, xm, xr); // Print final values
+return xm;
+}
+
+lab14
+#include <stdio.h>
+
+int KnapsackBT(int *w, int *v, int n, int wx, int i, int *x);
+
+int main() {
+int n = 5, wx = 11;
+int w[5] = {1, 2, 5, 6, 7};
+int v[5] = {1, 6, 18, 22, 28};
+int *x = new int[n];
+int vx;
+vx = KnapsackBT(w, v, n, wx, 0, x);
+printf("Value = %d \n", vx);
+for (int i = 0; i < n; i++)
+printf("%d \n", x[i]);
+delete[] x;
+return 0;
+}
+
+int KnapsackBT(int *w, int *v, int n, int wx, int i, int *x) {
+if (i == n || wx == 0) {
+return 0;
+}
+
+
+if (w[i] <= wx) {
+
+int with_i = v[i] + KnapsackBT(w, v, n, wx - w[i], i + 1, x + 1);
+int without_i = KnapsackBT(w, v, n, wx, i + 1, x + 1);
+
+if (with_i >= without_i) {
+*x = 1;
+return with_i;
+} else {
+*x = 0;
+return without_i;
+}
+} else {
+
+return KnapsackBT(w, v, n, wx, i + 1, x + 1);
+}
+}
