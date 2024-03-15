@@ -1,0 +1,55 @@
+def knapsackDP(w, v, wx):
+  """
+  ฟังก์ชันนี้ใช้ Dynamic Programming แก้ปัญหา Knapsack
+
+  Args:
+    w: รายการน้ำหนักของวัตถุ
+    v: รายการมูลค่าของวัตถุ
+    wx: น้ำหนักสูงสุดที่เป้สะพายได้
+
+  Returns:
+    มูลค่าสูงสุดของวัตถุที่สามารถใส่ในเป้สะพายได้
+  """
+
+  n = len(w)  # จำนวนวัตถุ
+  u = [[0 for _ in range(wx + 1)] for _ in range(n)]  # ตาราง DP
+  y = [[[] for _ in range(wx + 1)] for _ in range(n)]  # ตาราง DP
+
+  for i in range(n):
+    for j in range(wx + 1):
+      if i == 0:
+        a = 0
+        Sa = []
+      else:
+        a = u[i - 1][j]
+        Sa = y[i - 1][j]
+
+      if j - w[i] < 0:
+        b = -float("inf")
+        Sb = []
+      elif j - w[i] == 0 or i == 0:
+        b = v[i]
+        Sb = [i]
+      else:
+        b = u[i - 1][j - w[i]] + v[i]
+        Sb = [i] + y[i - 1][j - w[i]]
+
+      if a > b:
+        u[i][j] = a
+        y[i][j] = Sa
+      else:
+        u[i][j] = b
+        y[i][j] = Sb
+
+  return u[n - 1][wx]
+
+# ตัวอย่างการใช้งาน
+w = [1, 3, 4, 5]
+v = [10, 40, 50, 70]
+wx = 10
+
+# ค้นหามูลค่าสูงสุด
+x = knapsackDP(w, v, wx)
+
+# พิมพ์ผลลัพธ์
+print("มูลค่าสูงสุด:", x)
