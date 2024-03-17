@@ -1,0 +1,135 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <limits.h>
+#include <math.h>
+
+#define MAX_DATA_SIZE 5000
+
+struct DATA_File {
+  char Region[50];
+  char Country[50];
+  char ItemType[50];
+  int UnitsSold;
+  float UnitPrice;
+  float UnitCost;
+  float TotalRevenue;
+  float TotalCost;
+  float TotalProfit;
+};
+
+// Function to split a string based on delimiter
+void split_string(char *str, const char *delimiter, char result[][50], int num_tokens) {
+  int i = 0;
+  char *token;
+
+  token = strtok(str, delimiter);
+  while (token != NULL && i < num_tokens) {
+    strcpy(result[i++], token);
+    token = strtok(NULL, delimiter);
+  }
+}
+
+// Function to read data from CSV file
+int read_data_csv(const char *filename, struct DATA_File data[]) {
+  FILE *f = fopen(filename, "r");
+  char str[5000] = "";
+  int dataSize = 0;
+
+  if (f == NULL) {
+    printf("Can't open file!\n");
+    return -1;
+  }
+
+  // Skip header line (assuming first line contains headers)
+  fgets(str, sizeof(str), f);
+
+  while (fgets(str, sizeof(str), f) != NULL && dataSize < MAX_DATA_SIZE) {
+    char tokens[9][50]; // Assuming 9 comma-separated fields
+    split_string(str, ",", tokens, 9);
+
+    strcpy(data[dataSize].Region, tokens[0]);
+    strcpy(data[dataSize].Country, tokens[1]);
+    strcpy(data[dataSize].ItemType, tokens[2]);
+    data[dataSize].UnitsSold = strtol(tokens[3], NULL, 10); // Convert string to int
+    data[dataSize].UnitPrice = strtof(tokens[4], NULL); // Convert string to float
+    data[dataSize].UnitCost = strtof(tokens[5], NULL);
+    data[dataSize].TotalRevenue = strtof(tokens[6], NULL);
+    data[dataSize].TotalCost = strtof(tokens[7], NULL);
+    data[dataSize].TotalProfit = strtof(tokens[8], NULL);
+
+    dataSize++;
+  }
+
+  fclose(f);
+  return dataSize;
+}
+
+void findBestSellingProduct(struct DATA_File data[], int dataSize, const char* region) {
+  int maxUnitsSold = 0;
+  char bestSellingProduct[50] = "";
+
+  for (int i = 0; i < dataSize; i++) {
+    if (strcmp(data[i].Region, region) == 0 && data[i].UnitsSold > maxUnitsSold) {
+      maxUnitsSold = data[i].UnitsSold;
+      strcpy(bestSellingProduct, data[i].ItemType);
+    }
+  }
+
+  printf("Best selling product in %s: %s\n", region, bestSellingProduct);
+}
+
+void findWorstSellingProductOffline(struct DATA_File data[], int dataSize, const char* region) {
+  int minUnitsSoldOffline = INT_MAX;
+  char worstSellingProductOffline[50] = "";
+
+  for (int i = 0; i < dataSize; i++) {
+    if (strcmp(data[i].Region, region) == 0 && 
+        (strcmp(data[i].Country, "Asia") == 0 || strcmp(data[i].Country, "Offline") == 0) &&
+        data[i].UnitsSold < minUnitsSoldOffline) {
+      minUnitsSoldOffline = data[i].UnitsSold;
+      strcpy(worstSellingProductOffline, data[i].ItemType);
+    }
+  }
+
+  printf("Worst selling product offline in %s (Asia): %s\n", region, worstSellingProductOffline);
+}
+
+void findTopTenLowestCostProductsOnline(struct DATA_File data[], int dataSize, const char* region) {
+  // Assuming enough space for top 10 products
+  struct DATA_File topTen[10];
+  int topTenCount = 0;
+
+  for (int i = 0; i < dataSize; i++) {
+    if (strcmp(data[i].Region, region) == 0 && strcmp(data[i].Country, "Central America and the Caribbean") == 0) {
+      // Insert the product into topTen (sorting based on UnitCost)
+      int j = topTenCount;
+      while (j > 0 && data[i].UnitCost < topTen[j - 1].UnitCost) {
+        topTen[j] = topTen[j - 1];
+        j--;
+      }
+      topTen[j] = data[i];
+      topTenCount++;
+    }
+  }
+
+  printf("Top ten lowest cost products online in %s:\n", region);
+  for (int i = 0; i < topTenCount && i < 10; i++) {
+    printf("%d. %s\n", i + 1, topTen[i].ItemType);
+  }
+}
+
+int main() {
+  struct DATA_File data[MAX_DATA_SIZE];
+  int dataSize = read_data_csv("D:/f/5000 Sales Records.csv", data);
+
+  if (dataSize == -1) {
+    return 1;
+  }
+
+  findBestSellingProduct(data, dataSize, "Europe");
+  findWorstSellingProductOffline(data, dataSize, "Asia");
+  findTopTenLowestCostProductsOnline(data, dataSize, "Central America and the Caribbean");
+
+  return 0;
+}
