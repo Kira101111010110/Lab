@@ -1,0 +1,278 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct  {
+    char Region[ 100 ] ;
+    char Country[ 100 ] ;
+    char Item_Type[ 50 ] ;
+    char Sales_Channel[ 50 ] ;
+    char Order_Priority[ 50 ] ;
+    char Order_Date[ 50 ] ;
+    char Order_ID[ 50 ] ;
+    char Ship_Date[ 50 ] ;
+    float Units_Sold ;
+    float Unit_Price ;
+    float Unit_Cost ;
+    float Total_Revenue ;
+    float Total_Cost ;
+    float Total_Profit ;
+} data ;
+
+void read_data () {
+    FILE *fp = fopen( "D:/Testbeta/5000 Sales Records.csv", "r" ) ;
+    
+    char str[ 5000 ] ;
+    data rec ;
+    char *token ;
+    float max_units_sold_online = -1 ; 
+    float max_units_sold_offline = -1 ; 
+    char max_item_type_online[ 25 ] ;
+    char max_sales_channel_online[ 10 ] ;
+    char max_item_type_offline[ 25 ] ;
+    char max_sales_channel_offline[ 10 ] ;
+    float min_units_sold_online = 1000 ; 
+    float min_units_sold_offline = 1000 ;
+    char min_item_type_online[ 25 ] ;
+    char min_sales_channel_online[ 10 ] ; 
+    char min_item_type_offline[ 25 ] ;
+    char min_sales_channel_offline[ 10 ] ;
+    float max_Unit_Cost = 0 ;
+    char Unit_Cost_item_type_online[ 25 ] ;
+
+    if ( fp == NULL ) {
+        printf( "Can't open file!" ) ;
+        exit( 1 ) ;
+    }//end if loop
+
+    while ( fgets(str, sizeof( str ), fp ) != NULL ) {
+        int col = 0 ; 
+        token = strtok( str, "," ) ;
+        while ( token != NULL ) {
+            switch ( col ) {
+                case 0:
+                    strcpy( rec.Region, token ) ;
+                    break ;
+                case 1:
+                    strcpy( rec.Country, token ) ;
+                    break ;
+                case 2:
+                    strcpy( rec.Item_Type, token ) ;
+                    break ;
+                case 3:
+                    strcpy( rec.Sales_Channel, token ) ;
+                    break ;
+                case 4:
+                    strcpy( rec.Order_Priority, token ) ;
+                    break ;
+                case 5:
+                    strcpy( rec.Order_Date, token ) ;
+                    break ;
+                case 6:
+                    strcpy( rec.Order_ID, token ) ;
+                    break ;
+                case 7:
+                    strcpy( rec.Ship_Date, token ) ;
+                    break ;
+                case 8:
+                    rec.Units_Sold = atof( token ) ;
+
+                    if ( strcmp(rec.Region, "Europe" ) == 0 ) {
+                        if ( strcmp( rec.Sales_Channel, "Online" ) == 0 ) {
+                            if ( rec.Units_Sold > max_units_sold_online ) {
+                                max_units_sold_online = rec.Units_Sold ;
+                                strcpy( max_item_type_online, rec.Item_Type ) ;
+                                strcpy( max_sales_channel_online, rec.Sales_Channel ) ;
+                            }//end if loop
+                        } 
+                        else if ( strcmp( rec.Sales_Channel, "Offline" ) == 0 ) {
+                            if ( rec.Units_Sold > max_units_sold_offline ) {
+                                max_units_sold_offline = rec.Units_Sold ;
+                                strcpy( max_item_type_offline, rec.Item_Type ) ;
+                                strcpy( max_sales_channel_offline, rec.Sales_Channel ) ;
+                            }//end if loop
+                        }//end else if loop
+                    }//end if loop
+                    if ( strcmp( rec.Region, "Asia" ) == 0 ) {
+                        if ( strcmp( rec.Sales_Channel, "Online" ) == 0) {
+                            if ( rec.Units_Sold < min_units_sold_online ) {
+                                min_units_sold_online = rec.Units_Sold ;
+                                strcpy( min_item_type_online, rec.Item_Type ) ;
+                                strcpy( min_sales_channel_online, rec.Sales_Channel ) ;
+                            }//end if loop
+                        }//end if loop 
+                        else if ( strcmp( rec.Sales_Channel, "Offline" ) == 0 ) {
+                            if ( rec.Units_Sold < min_units_sold_offline ) {
+                                min_units_sold_offline = rec.Units_Sold ;
+                                strcpy( min_item_type_offline, rec.Item_Type ) ;
+                                strcpy( min_sales_channel_offline, rec.Sales_Channel ) ;
+                            }//end if loop
+                        }//end else if loop
+                    }//end if loop
+                    break ;
+                case 9:
+                    rec.Unit_Price = atof( token ) ;
+                    break ;
+                case 10:
+                    rec.Unit_Cost = atof( token ) ;
+                    break ;
+                case 11:
+                    rec.Total_Revenue = atof( token ) ;
+                    break ;
+                case 12:
+                    rec.Total_Cost = atof( token ) ;
+                    break ;
+                case 13:
+                    rec.Total_Profit = atof( token ) ;
+                    break ;
+            }
+            col++ ;
+            token = strtok( NULL, "," ) ;
+        }//end while loop
+    }//end while loop
+
+    fclose( fp ) ;
+
+    printf( "\nThe best Units Sold in Europe (Online)\n" ) ;
+    printf( "Item Units Sold in Europe: %s\n", max_item_type_online ) ;
+    printf( "Sales Units Sold in Europe: %s\n", max_sales_channel_online ) ;
+    printf( "Units Sold in Europe: %.2f\n\n", max_units_sold_online ) ;
+
+    printf( "The best Units Sold in Europe (Offline)\n" ) ;
+    printf( "Item Units Sold in Europe: %s\n", max_item_type_offline ) ;
+    printf( "Sales Units Sold in Europe: %s\n", max_sales_channel_offline ) ;
+    printf( "Units Sold in Europe: %.2f\n\n", max_units_sold_offline ) ;
+
+    printf( "The least Units Sold in Asia (Online)\n" ) ;
+    printf( "Item Units Sold in Asia: %s\n", min_item_type_online ) ;
+    printf( "Sales Units Sold in Asia: %s\n", min_sales_channel_online ) ;
+    printf( "Units Sold in Asia: %.2f\n\n", min_units_sold_online ) ;
+
+    printf( "The least Units Sold in Asia (Offline)\n" ) ;
+    printf( "Item Units Sold in Asia: %s\n", min_item_type_offline ) ; 
+    printf( "Sales Units Sold in Asia: %s\n", min_sales_channel_offline ) ;
+    printf( "Units Sold in Asia: %.2f\n\n", min_units_sold_offline ) ;
+
+}//end function void
+
+typedef struct{
+    char Region[50] , Country[50] , ItemT[50] , SChannnel[20] , OP[10] , Odate[20] ;     
+    int OID ;     
+    char Sdate[20] ;     
+    int UnitsS ;     
+    float UnitsP , UnitsC , TotalR , TotalC , TotalP ;
+} data1 ;
+
+void topic3 () {
+    // printf("1\n") ;
+    FILE *fp = fopen( "D:/f/5000 Sales Records.csv", "r" ) ;
+
+    char str[5000] ;
+    data1 rec[5000] ;
+    int c, cb = 0 ;
+    char *token ;
+
+    if ( fp == NULL ) {
+        printf( "Can't open file!" ) ;
+        exit( 1 ) ;
+    }
+
+    while ( fgets(str, sizeof( str ), fp ) != NULL ) {
+        int col = 0 ; 
+        token = strtok( str, "," ) ;
+        while ( token != NULL ) {
+            switch ( col ) {
+                case 0:
+                    strcpy( rec[ c ].Region, token ) ;
+                    break ;
+                case 1:
+                    strcpy( rec[ c ].Country, token ) ;
+                    break ;
+                case 2:
+                    strcpy( rec[ c ].ItemT, token ) ;
+                    break ;
+                case 3:
+                    strcpy( rec[ c ].SChannnel, token ) ;
+                    break ;
+                case 4:
+                    strcpy( rec[ c ].OP, token ) ;
+                    break ;
+                case 5:
+                    strcpy( rec[ c ].Odate, token ) ;
+                    break ;
+                case 6:
+                    rec[ c ].OID = atoi( token ) ;
+                    break ;
+                case 7:
+                    strcpy( rec[ c ].Sdate, token ) ;
+                    break ;
+                case 8:
+                    rec[ c ].UnitsS = atoi( token ) ;
+                    break ;
+                case 9:
+                    rec[ c ].UnitsP = atof( token ) ;
+                    break ;
+                case 10:
+                    rec[ c ].UnitsC = atof( token ) ;
+                    break ;
+                case 11:
+                    rec[ c ].TotalR = atof( token ) ;
+                    break ;
+                case 12:
+                    rec[ c ].TotalC = atof( token ) ;
+                    break ;
+                case 13:
+                    rec[ c ].TotalP = atof( token ) ;
+                    break ;
+            }
+            
+            col++ ;
+            token = strtok( NULL, "," ) ;
+        }
+        c++ ;
+    }
+
+    for( int i = 0 ; i < c ; i++ ) {
+					
+		for( int j = i + 1 ; j < c ; j++ ) {
+						
+			if( rec[ i ].UnitsC < rec[ j ].UnitsC ) {
+							
+				data1 Temp = rec[ i ] ;
+				rec[ i ] = rec [ j ] ;
+				rec[ j ] = Temp ;						
+			} 				
+		}		
+	}
+
+    printf( "                                                                           Unit Cost Top 10\n\n" ) ;
+    printf( "------------------------------------------------------------------------------------------------------------------------------------------------------------\n" );
+    printf("No.|               Region                |                 Country               |     Item Type     |  Sales Channel  |    Order Priority  |    Unit_Cost  |\n");
+    printf( "------------------------------------------------------------------------------------------------------------------------------------------------------------\n" );
+    for(int x = 0 ; x < c ; x++) {
+		
+		if( strcmp( rec[x].Region, "Central America and the Caribbean" ) == 0 && strcmp( rec[ x ].SChannnel, "Online" ) == 0 ) {
+			 
+			cb++ ;
+            printf( "%2d |   %20s |   %35s |   %s |   %8.5s      |   %8s         |      %.2f   | \n", 
+            cb,rec[ x ].Region, rec[ x ].Country,rec[ x ].ItemT, rec[ x ].SChannnel,rec[ x ].OP, rec[ x ].UnitsC ) ;
+            printf( "------------------------------------------------------------------------------------------------------------------------------------------------------------\n" );
+			
+		}
+		
+		if ( cb == 10 ) {
+			
+			break ;
+			
+		}
+			
+	}
+    fclose( fp ) ;
+}
+
+
+int main() {
+    read_data() ;
+    topic3 () ;
+    return 0 ;
+}
