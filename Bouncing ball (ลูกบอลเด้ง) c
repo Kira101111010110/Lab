@@ -1,0 +1,152 @@
+#include <windows.h>
+
+
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 600;
+
+
+const int BALL_SIZE = 20;
+const int BLOCK_WIDTH = 100;
+const int BLOCK_HEIGHT = 20;
+
+
+int ballSpeedX = 5;
+int ballSpeedY = 5;
+
+
+int ballPosX = 400;
+int ballPosY = 300;
+
+
+int blockPosX = 350;
+int blockPosY = 550;
+
+
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    const char CLASS_NAME[] = "BallBlockGame";
+
+    WNDCLASS wc = { };
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = hInstance;
+    wc.lpszClassName = CLASS_NAME;
+
+    RegisterClass(&wc);
+
+    HWND hwnd = CreateWindowEx(
+        0,
+        CLASS_NAME,
+        "Ball and Block Game",
+        WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT, WINDOW_WIDTH, WINDOW_HEIGHT,
+        NULL,
+        NULL,
+        hInstance,
+        NULL
+    );
+
+    if (hwnd == NULL) {
+        return 0;
+    }
+
+    ShowWindow(hwnd, nCmdShow);
+
+  
+    SetTimer(hwnd, 1, 30, NULL);
+
+    MSG msg = { };
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    return 0;
+}
+
+void MoveBall() {
+    ballPosX += ballSpeedX;
+    ballPosY += ballSpeedY;
+
+    if (ballPosX < 0 || ballPosX + BALL_SIZE > WINDOW_WIDTH) {
+        ballSpeedX = -ballSpeedX;
+    }
+    if (ballPosY < 0 || ballPosY + BALL_SIZE > WINDOW_HEIGHT) {
+        ballSpeedY = -ballSpeedY;
+    }
+
+  
+    if (ballPosX + BALL_SIZE >= blockPosX && ballPosX <= blockPosX + BLOCK_WIDTH &&
+        ballPosY + BALL_SIZE >= blockPosY && ballPosY <= blockPosY + BLOCK_HEIGHT) 
+		{
+        ballSpeedY = -ballSpeedY;
+    	}
+}
+
+void Draw(HDC hdc) {
+
+    HBRUSH backgroundBrush = CreateSolidBrush(RGB(0, 0, 0));
+    RECT backgroundRect = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+    FillRect(hdc, &backgroundRect, backgroundBrush);
+    DeleteObject(backgroundBrush);
+
+    SetTextColor(hdc, RGB(255, 0, 0));
+    SetBkMode(hdc, TRANSPARENT);
+    TextOut(hdc, ballPosX, ballPosY, "O", 1);
+
+    SetTextColor(hdc, RGB(0, 255, 0));
+    TextOut(hdc, blockPosX, blockPosY, "========", 8);
+}
+
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    switch (uMsg) {
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            return 0;
+
+        case WM_PAINT: {
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hwnd, &ps);
+            Draw(hdc);
+            EndPaint(hwnd, &ps);
+        }
+        return 0;
+
+        case WM_KEYDOWN:
+            if (wParam == VK_LEFT) {
+                blockPosX -= 20;
+                if (blockPosX < 0) blockPosX = 0;
+            }
+            if (wParam == VK_RIGHT) {
+                blockPosX += 20;
+                if (blockPosX + 8*10 > WINDOW_WIDTH) blockPosX = WINDOW_WIDTH - 8*10;
+            }
+            if (wParam == VK_UP) {
+                blockPosY -= 20;
+                if (blockPosY < 0) blockPosY = 0;
+            }
+            if (wParam == VK_DOWN) {
+                blockPosY += 20;
+                if (blockPosY + 20 > WINDOW_HEIGHT) blockPosY = WINDOW_HEIGHT - 20; 
+            } 
+			if (wParam == VK_ESCAPE) {
+        		PostQuitMessage(0); 
+    		}
+    		return 0;
+
+
+            
+            InvalidateRect(hwnd, NULL, TRUE);
+            return 0;
+
+        case WM_TIMER:
+            MoveBall();
+            InvalidateRect(hwnd, NULL, TRUE);
+            return 0;
+
+        case WM_CREATE:
+            SetTimer(hwnd, 1, 30, NULL);
+            return 0;
+    }
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
